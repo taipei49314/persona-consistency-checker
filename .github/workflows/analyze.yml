@@ -3,9 +3,7 @@ name: Persona Consistency Analysis
 on:
   push:
     paths:
-      - 'data/test_dialogues.json'
-      - 'src/**'
-      - 'configs/**'
+      - '**'
 
 jobs:
   analyze:
