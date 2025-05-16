@@ -1,6 +1,6 @@
 import streamlit as st
 import json
-from utils import normalize_text, compute_similarity, check_speech_patterns
+from src.utils import normalize_text, compute_similarity, check_speech_patterns
 
 # 預設人格（簡化範例）
 with open("configs/settings.yaml", "r", encoding="utf-8") as f:
