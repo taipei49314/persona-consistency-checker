@@ -31,7 +31,7 @@ def analyze_consistency(persona, dialogues):
                 "inconsistency_flag": sim_score < 0.4
             }
             session_result['utterances'].append(out)
-            print(f"- "{utt}" => Score: {sim_score:.2f}, Patterns: {pattern_hits}, Inconsistent: {out['inconsistency_flag']}")
+            print(f'- "{utt}" => Score: {sim_score:.2f}, Patterns: {pattern_hits}, Inconsistent: {out["inconsistency_flag"]}')
         results.append(session_result)
 
     return results
