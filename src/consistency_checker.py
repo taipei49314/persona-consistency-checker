@@ -1,5 +1,5 @@
 import json
-from src.utils import normalize_text, compute_similarity, check_speech_patterns
+from utils import normalize_text, compute_similarity, check_speech_patterns
 
 def load_data(persona_path, dialogue_path):
     with open(persona_path, 'r') as f:
