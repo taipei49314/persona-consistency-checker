@@ -1,0 +1,15 @@
+{
+    "name": "User A",
+    "traits": {
+        "curiosity": "high",
+        "analytical": "very strong",
+        "emotional_attachment": "low",
+        "language_consistency": "high",
+        "self-awareness": "strong"
+    },
+    "speech_patterns": [
+        "direct questioning",
+        "interrogative tone",
+        "logical dissection of prior messages"
+    ]
+}

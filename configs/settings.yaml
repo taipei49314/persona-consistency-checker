@@ -1,0 +1,3 @@
+persona_file: data/base_persona.json
+dialogue_file: data/test_dialogues.json
+output_report: reports/2025-05-16_analysis.md
