@@ -80,3 +80,47 @@ if nickname:
         )
 else:
     st.warning("請先輸入你的綽號才能開始分析 / Please enter your nickname.")
+
+# 載入每日任務題庫
+with open("data/daily_missions.json", "r", encoding="utf-8") as f:
+    missions = json.load(f)
+
+import random
+daily = random.choice(missions)
+st.divider()
+st.markdown("## 🎯 Persona Daily Mission · 每日任務")
+st.markdown(f"**類型：{daily['type']}**")
+st.markdown(f"📌 **題目：{daily['prompt']}**")
+user_daily_input = st.text_area("請輸入你會怎麼說 / What would you say?", key="daily_input", height=100)
+
+if user_daily_input and nickname:
+    utt_norm = normalize_text(user_daily_input)
+    sim_score = compute_similarity(utt_norm, persona)
+    matched = [kw for kw in pattern_hits if kw in utt_norm]
+    inconsistent = sim_score < 0.5
+
+    st.markdown("### 🧪 分析結果")
+    st.markdown(f"- 語句內容：`{user_daily_input}`")
+    st.progress(sim_score, text=f"一致性分數：{sim_score:.2f}")
+    st.markdown(f"- 命中語氣特徵：{matched}")
+    st.markdown(f"- 判定：{'❌ 偏離語氣' if inconsistent else '✅ 一致'}")
+
+    mission_record = {
+        "nickname": nickname,
+        "mission_id": daily["id"],
+        "mission_type": daily["type"],
+        "mission_prompt": daily["prompt"],
+        "input": user_daily_input,
+        "language": lang,
+        "score": round(sim_score, 3),
+        "patterns_hit": matched,
+        "drift": inconsistent,
+        "timestamp": datetime.now().isoformat()
+    }
+
+    st.download_button(
+        "📥 下載任務結果（JSON）",
+        data=json.dumps(mission_record, ensure_ascii=False, indent=2),
+        file_name=f"{nickname}_mission_{daily['id']}.json",
+        mime="application/json"
+    )
