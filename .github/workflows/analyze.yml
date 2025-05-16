@@ -1,0 +1,34 @@
+name: Persona Consistency Analysis
+
+on:
+  push:
+    paths:
+      - 'data/test_dialogues.json'
+      - 'src/**'
+      - 'configs/**'
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+
+      - name: Run consistency checker
+        run: |
+          python src/consistency_checker.py
+
+      - name: Upload analysis report
+        uses: actions/upload-artifact@v3
+        with:
+          name: consistency-report
+          path: reports/consistency_report.json
