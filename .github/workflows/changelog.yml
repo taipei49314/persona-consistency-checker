@@ -32,16 +32,52 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Append release notes to CHANGELOG.md
+      - name: Extract release type and inject changelog with emoji
         run: |
-          echo -e "\n## [${{ github.event.release.tag_name }}] - $(date +%F)" >> CHANGELOG.md
-          echo "### ✨ ${{ github.event.release.name }}" >> CHANGELOG.md
+          RELEASE_TAG="${{ github.event.release.tag_name }}"
+          RAW_TITLE="${{ github.event.release.name }}"
+          RELEASE_BODY="${{ github.event.release.body }}"
+
+          # 預設值
+          CATEGORY="[Misc]"
+          EMOJI="📦"
+          CLEAN_TITLE="$RAW_TITLE"
+
+          # 分類與 emoji 對應 + 清洗 title 前綴
+          if echo "$RELEASE_BODY" | grep -qiE '^新增：|^Add:'; then
+            CATEGORY="[Add]"
+            EMOJI="✨"
+            CLEAN_TITLE=$(echo "$RAW_TITLE" | sed -E 's/^(新增：|Add:) ?//I')
+          elif echo "$RELEASE_BODY" | grep -qiE '^修正：|^Fix:'; then
+            CATEGORY="[Fix]"
+            EMOJI="🐛"
+            CLEAN_TITLE=$(echo "$RAW_TITLE" | sed -E 's/^(修正：|Fix:) ?//I')
+          elif echo "$RELEASE_BODY" | grep -qiE '^停用：|^Deprecate:'; then
+            CATEGORY="[Deprecate]"
+            EMOJI="⚠️"
+            CLEAN_TITLE=$(echo "$RAW_TITLE" | sed -E 's/^(停用：|Deprecate:) ?//I')
+          elif echo "$RELEASE_BODY" | grep -qiE '^移除：|^Remove:'; then
+            CATEGORY="[Remove]"
+            EMOJI="🗑️"
+            CLEAN_TITLE=$(echo "$RAW_TITLE" | sed -E 's/^(移除：|Remove:) ?//I')
+          elif echo "$RELEASE_BODY" | grep -qiE '^安全：|^Security:'; then
+            CATEGORY="[Security]"
+            EMOJI="🔒"
+            CLEAN_TITLE=$(echo "$RAW_TITLE" | sed -E 's/^(安全：|Security:) ?//I')
+          elif echo "$RELEASE_BODY" | grep -qiE '^說明：|^Docs:'; then
+            CATEGORY="[Docs]"
+            EMOJI="📝"
+            CLEAN_TITLE=$(echo "$RAW_TITLE" | sed -E 's/^(說明：|Docs:) ?//I')
+          fi
+
+          echo -e "\n## [$RELEASE_TAG] - $(date +%F)" >> CHANGELOG.md
+          echo "### $EMOJI $CATEGORY $CLEAN_TITLE" >> CHANGELOG.md
           echo "" >> CHANGELOG.md
-          echo "${{ github.event.release.body }}" >> CHANGELOG.md
+          echo "$RELEASE_BODY" >> CHANGELOG.md
           echo -e "\n---" >> CHANGELOG.md
 
       - name: Commit and push changes
         run: |
           git add CHANGELOG.md
-          git commit -m "Auto-update changelog for ${{ github.event.release.tag_name }}" || echo "Nothing to commit"
+          git commit -m "Auto-update changelog for ${{ github.event.release.tag_name }}" || echo "No changes"
           git push origin main
