@@ -33,3 +33,11 @@
 
 
 ---
+
+## [v3.2-addtest] - 2025-05-17
+### ✨ PersonaChain v3.2 新增功能測試
+
+新增：支援自動分類與 emoji label 的 changelog 模組。
+
+
+---
