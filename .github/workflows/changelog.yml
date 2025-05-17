@@ -1,0 +1,46 @@
+name: Auto Commit Changelog
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  update-changelog:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Pull latest main
+        run: |
+          git fetch origin main
+          git checkout main
+          git reset --hard origin/main
+
+      - name: Setup Git Identity
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Append release notes to CHANGELOG.md
+        run: |
+          echo "" >> CHANGELOG.md
+          echo "## [${{ github.event.release.tag_name }}] - $(date +%F)" >> CHANGELOG.md
+          echo "### ✨ ${{ github.event.release.name }}" >> CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          echo "${{ github.event.release.body }}" >> CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          echo "---" >> CHANGELOG.md
+
+      - name: Commit and Push if changed
+        run: |
+          if git diff --quiet; then
+            echo "No changes in CHANGELOG.md, skipping commit."
+          else
+            git add CHANGELOG.md
+            git commit -m "Auto-update changelog for ${{ github.event.release.tag_name }}"
+            git push origin main
+          fi
