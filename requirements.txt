@@ -1,2 +1,1 @@
-streamlit
-pyyaml
+# 共用 Python 依賴 placeholder
