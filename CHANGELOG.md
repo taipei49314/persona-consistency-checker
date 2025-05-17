@@ -25,3 +25,11 @@
 
 ---
 
+
+## [v3.1-tokenfix] - 2025-05-17
+### ✨ PersonaChain v3.1 changelog 寫入權限修復測試
+
+此版本用於驗證 GitHub Actions 是否已取得寫入權限。
+
+
+---
