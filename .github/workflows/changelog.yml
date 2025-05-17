@@ -9,16 +9,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repo
+      - name: Checkout full history
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - name: Pull latest main
+      - name: Pull latest main branch
         run: |
           git fetch origin main
           git checkout main
           git reset --hard origin/main
+
+      - name: Ensure CHANGELOG.md exists
+        run: |
+          if [ ! -f CHANGELOG.md ]; then
+            echo "# 📦 Changelog" > CHANGELOG.md
+            echo -e "\n本文件記錄 PersonaChain 專案的發佈歷程與主要變更內容。\n\n---" >> CHANGELOG.md
+          fi
 
       - name: Setup Git Identity
         run: |
@@ -27,20 +34,14 @@ jobs:
 
       - name: Append release notes to CHANGELOG.md
         run: |
-          echo "" >> CHANGELOG.md
-          echo "## [${{ github.event.release.tag_name }}] - $(date +%F)" >> CHANGELOG.md
+          echo -e "\n## [${{ github.event.release.tag_name }}] - $(date +%F)" >> CHANGELOG.md
           echo "### ✨ ${{ github.event.release.name }}" >> CHANGELOG.md
           echo "" >> CHANGELOG.md
           echo "${{ github.event.release.body }}" >> CHANGELOG.md
-          echo "" >> CHANGELOG.md
-          echo "---" >> CHANGELOG.md
+          echo -e "\n---" >> CHANGELOG.md
 
-      - name: Commit and Push if changed
+      - name: Commit and push changes
         run: |
-          if git diff --quiet; then
-            echo "No changes in CHANGELOG.md, skipping commit."
-          else
-            git add CHANGELOG.md
-            git commit -m "Auto-update changelog for ${{ github.event.release.tag_name }}"
-            git push origin main
-          fi
+          git add CHANGELOG.md
+          git commit -m "Auto-update changelog for ${{ github.event.release.tag_name }}" || echo "Nothing to commit"
+          git push origin main
